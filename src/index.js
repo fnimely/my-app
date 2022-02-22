@@ -69,7 +69,7 @@ class Board extends React.Component {
 
     return (
       <div>
-        <div className="status">{status}</div>
+        {/* <div className="status">{status}</div> */}
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -106,7 +106,7 @@ class Game extends React.Component {
   handleClick(i) {
     const history = this.state.history;
     const current = history[history.length - 1];
-    const squares = this.squares.slice();
+    const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
@@ -126,6 +126,16 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[history.length - 1];
     const winner = calculateWinner(current.squares);
+
+    // prettier-ignore        // elm, index
+    const moves = history.map((step, move) => {
+      const desc = move ? "Go to move #" + move : "Go to game start";
+      return (
+        <li>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+        </li>
+      );
+    });
     let status;
 
     if (winner) {
@@ -133,6 +143,7 @@ class Game extends React.Component {
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
+
     return (
       <div className="game">
         <div className="game-board">
@@ -143,7 +154,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{/* TODO */}</ol>
+          <ol>{moves}</ol>
         </div>
       </div>
     );
@@ -185,4 +196,12 @@ the children in sync with each other.
 FUNCTION COMPONENT - a simpler way to write components that only contains a render
 method and don't have their own state.
 
+To render multiple elms, we can use an array of react elms.
+
+KEYS tell react about the identity of each components which allows react to maintain
+states between re-renders. If a component's key changes, the component will be
+destroyed and recreated with a new state. 'key' is a special and reserved property.
+Key are extracted and stored directly on the returned elms after that elm is created
+Keys cannot be referenced using props. React uses keys to decide which components to
+update. Proper keys must be assigned whenever we build dynamic list.
 */
