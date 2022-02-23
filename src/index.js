@@ -99,12 +99,13 @@ class Game extends React.Component {
           squares: Array(9).fill(null),
         },
       ],
+      stepNumber: 0, // indicate which step we are currently viewing
       xIsNext: true,
     };
   }
 
   handleClick(i) {
-    const history = this.state.history;
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
@@ -118,20 +119,28 @@ class Game extends React.Component {
           squares: squares,
         },
       ]),
+      stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
+    });
+  }
+
+  jumpTo(step) {
+    this.setState({
+      stepNumber: step,
+      xIsNext: step % 2 === 0,
     });
   }
 
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
     // prettier-ignore        // elm, index
     const moves = history.map((step, move) => {
       const desc = move ? "Go to move #" + move : "Go to game start";
       return (
-        <li>
+        <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
@@ -198,10 +207,16 @@ method and don't have their own state.
 
 To render multiple elms, we can use an array of react elms.
 
+When a list is rendered, REACT stores some info about each rendered list item, and
+when that list is updated, REACT needs to determine what has changed.
 KEYS tell react about the identity of each components which allows react to maintain
 states between re-renders. If a component's key changes, the component will be
 destroyed and recreated with a new state. 'key' is a special and reserved property.
 Key are extracted and stored directly on the returned elms after that elm is created
 Keys cannot be referenced using props. React uses keys to decide which components to
 update. Proper keys must be assigned whenever we build dynamic list.
+If no key is specified, REACT presents a warning and uses the array index as a key by
+default which can lead to problems when trying to reorder or insert/remove list items.
+Keys do not need to be globally unique but must be unique between components and their
+sinlings.
 */
